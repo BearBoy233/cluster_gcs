@@ -1,7 +1,11 @@
-<?xml version="1.0"?>
+
 <launch>
 
-    	<arg name="uav1_gcs2" default="2" />
+	<!-- MAP 模块 --> 
+    	<arg name="rospackage_path" default="$(find map_widget)" />
+
+	<!-- Track 模块 --> 
+        <arg name="uav1_gcs2" default="2" />
 	<arg name="gcs_uavip" default="192.168.50.199" />
 	<arg name="uav_video_topic" default="/kcfTracker/image_raw" />
         <!-- 
@@ -11,7 +15,8 @@
                 [ /camera/color/image_raw] 	/csi_cam_0
         -->
 
-	<param name="uav1_gcs2" value="$(arg uav1_gcs2)" type="int" />
+	<param name="rospackage_path" value="$(arg rospackage_path)" type="string" />
+        <param name="uav1_gcs2" value="$(arg uav1_gcs2)" type="int" />
 	<param name="gcs_uavip" value="$(arg gcs_uavip)" type="string" />
 	<param name="uav_video_topic" value="$(arg uav_video_topic)" type="string" />
 
@@ -19,4 +24,3 @@
         </node>
 
 </launch>
-

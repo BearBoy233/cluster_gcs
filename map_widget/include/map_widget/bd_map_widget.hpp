@@ -77,6 +77,7 @@ private slots:
   void on_DisGPS_pushButton_close_clicked();
   // 获取点击坐标
   void on_HomeGPS_pushButton_Obtain_Point_clicked();
+  void on_HomeGPS_pushButton_Obtain_Point_2_clicked();
   // 显示无人机轨迹相关按钮
   void on_showtrack_pushButton_all_on_clicked();
   void on_showtrack_pushButton_all_off_clicked();

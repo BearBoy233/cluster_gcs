@@ -18,6 +18,8 @@ bd_map_widget::bd_map_widget(int argc, char** argv, QWidget *parent)
 {
   ui->setupUi(this);
 
+  bd_map_qnode.init();
+
   // init()_1;
   m_pWebView = ui->webView;
   m_pWebChannel = new QWebChannel(this);
@@ -29,16 +31,21 @@ bd_map_widget::bd_map_widget(int argc, char** argv, QWidget *parent)
   }
 
   // loadHtml();
-  QString htmlPath = QCoreApplication::applicationDirPath(); // 获取程序所在路径，切换到同目录下的 地图html
-  QString temp_path_y = "cq_gcs";
-  int temp_path_1 = htmlPath.indexOf(temp_path_y);
-  temp_path_y = "file://" + htmlPath.left(temp_path_1) + "cq_gcs/src/offline_bmap/BMap_offline.html";
-  // QString temp_path_y = "map_bd"; "gcs_ws"; "cq_gcs";
-  // temp_path_y = "file://" + htmlPath.left(temp_path_1) + "gcs_ws/src/offline_bmap/BMap_offline.html";
+  // 获取程序所在路径，切换到同目录下的 地图html
+  // 导入的是 ..cq_gcs/devel.. 的名称
+  // QString htmlPath = QCoreApplication::applicationDirPath();
+  // // 显示APP 路径 /home/zy/zy_new_mavros/cq_gcs/devel/lib/map_widget;
+  // // ui->label->setText(qApp->applicationDirPath());
+  // QString temp_path_y = "cq_gcs";
+  // int temp_path_1 = htmlPath.indexOf(temp_path_y);
+  // temp_path_y = "file://" + htmlPath.left(temp_path_1) + "cq_gcs/src/cluster_gcs/offline_bmap/BMap_offline.html";
+
+  // 通过ROS导入
+  QString temp_path_y;
+  temp_path_y = "file://" + QString::fromStdString(bd_map_qnode.rospackage_path) + "/../offline_bmap/BMap_offline.html";
+  qDebug() << "Map_html path = " << temp_path_y;
 
   m_pWebView->load(QUrl(temp_path_y));
-  // m_pWebView->load(QUrl("file:///home/zy/cq_ws/map_bd/src/map_widget/resources/BMap.html"));
-  // m_pWebView->load(QUrl("file:///home/zy/cq_ws/map_bd/src/offline_bmap/BMap_offline.html"));
 
   // 注册一个qtui对象  html端通过此名称向qt发送消息
   m_pWebChannel->registerObject(QString("qtui"), this);
@@ -77,16 +84,16 @@ bd_map_widget::bd_map_widget(int argc, char** argv, QWidget *parent)
     checkBox_showtrack[iii]->setChecked(0);
     checkBox_showtrack[iii]->setEnabled(0);
     ui->gridLayout_track->addWidget(checkBox_showtrack[iii], ((iii-1)/4), ((iii-1)%4) );
-    // connect(checkBox_showtrack[iii], SIGNAL(clicked()), signalMapper, SLOT( map() ) );  //原始信号传递给signalmapper
-    connect(checkBox_showtrack[iii], SIGNAL(stateChanged(int)), signalMapper, SLOT( map() ) );  //原始信号传递给signalmapper
+    // connect(checkBox_showtrack[iii], SIGNAL(clicked()), signalMapper, SLOT( map() ) );             //原始信号传递给signalmapper
+    connect(checkBox_showtrack[iii], SIGNAL(stateChanged(int)), signalMapper, SLOT( map() ) );        //原始信号传递给signalmapper
     signalMapper->setMapping (checkBox_showtrack[iii], iii);
   }
-  connect(signalMapper, SIGNAL(mapped (const int) ), this, SLOT( doClicked_showtrack(const int) ) );//将转发的信号连接到最终的槽函数
+  connect(signalMapper, SIGNAL(mapped (const int) ), this, SLOT( doClicked_showtrack(const int) ) );  //将转发的信号连接到最终的槽函数
 
-  bd_map_qnode.init();
+  // 设置初始地图位置
+  ui->HomeGPS_lineEdit_lon->setText( QString::number(bd_map_qnode.map_init_lon, 'f', 6) );
+  ui->HomeGPS_lineEdit_lat->setText( QString::number(bd_map_qnode.map_init_lat, 'f', 6) );
 
-  // 显示APP 路径 /home/zy/zy_new_mavros/cq_gcs/devel/lib/map_widget
-  // ui->label->setText(qApp->applicationDirPath());
 }
 
 
@@ -104,7 +111,7 @@ void bd_map_widget::initConncetion()
 {
 
 //--------------------------------------
-// 测试用
+   // 测试用
    // 调用js
    connect(ui->callJSBtn, &QPushButton::clicked, [&]() {
        QString jsStr = QString("addCircle()");
@@ -223,7 +230,7 @@ void bd_map_widget::recieveJsMessage_Point_GPS(const QString& jsMsg)
 {
     flag_Set_marker1 = 1;
     flag_Set_marker1_2 = 0; // 防止重复生成
-    ui->label->setText(jsMsg);
+    // ui->label->setText(jsMsg);
 
     QString x = jsMsg;
     QString y = ",";
@@ -254,6 +261,7 @@ void bd_map_widget::on_HomeGPS_pushButton_Set_centerLonLat_clicked()
       return;
     }
   QString strVal = QString("Set_centerLonLat(\"%1\",\"%2\");").arg(Str_Data_Gps_lon).arg(Str_Data_Gps_lat);
+  // qDebug() << "strVal set init : " << strVal;
   m_pWebView->page()->runJavaScript(strVal);
 }
 
@@ -313,6 +321,29 @@ void bd_map_widget::on_HomeGPS_pushButton_Obtain_Point_clicked()
     { strVal = QString("addMapEvent_GetCheckPointGPS();");}
     m_pWebView->page()->runJavaScript(strVal);
   }
+}
+
+// 调整视野
+void bd_map_widget::on_HomeGPS_pushButton_Obtain_Point_2_clicked()
+{
+  if(!ui->HomeGPS_lineEdit_lon->text().contains(QRegExp("^(\\-|\\+)?\\d+(\\.\\d+)?$")))
+    { QMessageBox::warning(NULL, QStringLiteral("提示"), QStringLiteral("请确保'经度'输入正确数字"),
+                 QMessageBox::NoButton, QMessageBox::Yes);
+      return;
+    }
+  if(!ui->HomeGPS_lineEdit_lat->text().contains(QRegExp("^(\\-|\\+)?\\d+(\\.\\d+)?$")))
+    { QMessageBox::warning(NULL, QStringLiteral("提示"), QStringLiteral("请确保'纬度'输入正确数字"),
+                 QMessageBox::NoButton, QMessageBox::Yes);
+      return;
+    }
+
+  // QString strVal = QString("Set_init_centerLonLat(\"%1\",\"%2\",\"%3\");")
+  //    .arg(bd_map_qnode.map_init_lon).arg(bd_map_qnode.map_init_lat).arg(18);
+  QString strVal = QString("Set_init_centerLonLat(\"%1\",\"%2\",\"%3\");")
+      .arg(ui->HomeGPS_lineEdit_lon->text()).arg(ui->HomeGPS_lineEdit_lat->text()).arg(18);
+  // qDebug() << "strVal set init : " << strVal;
+  m_pWebView->page()->runJavaScript(strVal);
+
 }
 
 // -------------------------------------------------------------------------

@@ -34,7 +34,7 @@
 <script type="text/javascript">
 	// Baidu Map API Function
 	map = new BMap.Map("allmap", {enableMapClick:false,minZoom:8,maxZoom:22});  // 创建Map实例 &关闭底图可点功能 &设置地图允许最小/大级别
-    map.centerAndZoom(new BMap.Point(116.323192,39.965301), 18);                // 初始化,设置中心点坐标 &地图缩放级别
+    map.centerAndZoom(new BMap.Point(116,39), 4);                // 初始化,设置中心点坐标 &地图缩放级别
 	map.addControl(new BMap.MapTypeControl({ mapTypes:[BMAP_SATELLITE_MAP, BMAP_NORMAL_MAP, BMAP_HYBRID_MAP ]})); // 添加地图类型控件
     // map.setCurrentCity("北京");                                              // 离线下不支持 设置地图显示的城市 此项是必须设置的
     map.enableScrollWheelZoom(true);                                           // 开启鼠标滚轮缩放        
@@ -60,7 +60,7 @@
     drone_last_pos_num = new Array();
     drone_last_track_polyline = new Array(); 
     // 初始化
-    Init_Set_drone_GPS(116.323192, 39.965301);   // 初始无人机位置
+    Init_Set_drone_GPS(116, 39);   // 初始无人机位置
     Init_plane_track(); // 初始无人机轨迹
     // alert(233);
 
@@ -283,6 +283,10 @@
     function Set_centerLonLat(xL,yL)
     {   map.centerAndZoom(new BMap.Point(xL, yL), map.getZoom() );  }
 
+    // 视野回到 Home 中心点
+    function Set_init_centerLonLat(xL,yL,zoom)
+    {   map.centerAndZoom(new BMap.Point(xL, yL), zoom);  }
+
     //----------------------------------------------------------------
     // qt 直接 访问此函数
     // 设置 Home 点　初始第一次
@@ -359,6 +363,7 @@
 	}
 </script>
 
+<!--
 <script type="text/javascript"> // 添加绿色箭头线
     var sy = new BMap.Symbol(BMap_Symbol_SHAPE_BACKWARD_OPEN_ARROW, {
         scale: 0.6,//图标缩放大小
@@ -385,6 +390,7 @@
     map.addOverlay(polyline);          //增加折线
 </script>
 
+
 <script type="text/javascript">
 	// 创建点
     var polyline = new BMap.Polyline([
@@ -405,3 +411,5 @@
         map.clearOverlays();
     }
 </script>
+
+-->

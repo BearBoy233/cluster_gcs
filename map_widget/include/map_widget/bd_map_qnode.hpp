@@ -32,6 +32,11 @@ public:
   // 广播 地图中设定的Home点的 GPS 坐标
   void cb_pb_home_gps(double temp_lon,double temp_lat);
 
+  std::string rospackage_path;
+  double map_init_lon;
+  double map_init_lat;
+
+
   // widget 可直接访问的 Data
   bool DataS_drone_gps_flag[NNN];
   bool DataS_drone_gps_update_flag[NNN];
