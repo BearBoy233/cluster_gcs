@@ -1,0 +1,407 @@
+﻿<!DOCTYPE html>
+
+<!--
+<style> /*去除 左下角 百度地图版权   logo*/
+    .anchorBL{display:none;} 
+</style>
+-->
+
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+
+	<style type="text/css">
+    	body, html,#allmap {width: 100%;height: 100%;margin:0;font-family:"微软雅黑";}
+	</style>
+
+	<!-- BaiduMap 3.0 Offline API Begin -->
+	<script type="text/javascript" src="./map3.0_init.js"></script>
+    <script type="text/javascript" src="./map3.0.js"></script>
+    <script type="text/javascript" src="./library/DistanceTool_min.js"></script>
+    <!-- BaiduMap 3.0 End -->
+    <script type="text/javascript" src="./jquery.js"></script>
+    <script type="text/javascript" src="./layer.js"></script>
+    
+    <script src="./qwebchannel.js"></script>
+	<title>BaiduMap_JSAPI_v3</title>
+</head>
+<body>
+	<div id="allmap"></div>
+</body>
+</html>
+
+<script type="text/javascript">
+	// Baidu Map API Function
+	map = new BMap.Map("allmap", {enableMapClick:false,minZoom:8,maxZoom:22});  // 创建Map实例 &关闭底图可点功能 &设置地图允许最小/大级别
+    map.centerAndZoom(new BMap.Point(116.323192,39.965301), 18);                // 初始化,设置中心点坐标 &地图缩放级别
+	map.addControl(new BMap.MapTypeControl({ mapTypes:[BMAP_SATELLITE_MAP, BMAP_NORMAL_MAP, BMAP_HYBRID_MAP ]})); // 添加地图类型控件
+    // map.setCurrentCity("北京");                                              // 离线下不支持 设置地图显示的城市 此项是必须设置的
+    map.enableScrollWheelZoom(true);                                           // 开启鼠标滚轮缩放        
+	var scaleCtrl = new BMap.ScaleControl();                              
+    map.addControl(scaleCtrl);                                                 // 添加比例尺控件
+    var top_left_navigation = new BMap.NavigationControl({anchor: BMAP_ANCHOR_TOP_LEFT, type: BMAP_NAVIGATION_CONTROL_SMALL}); 
+    map.addControl(top_left_navigation);                                      //右上角，包含平移和缩放按钮
+    /* 缩放控件type有四种类型: /1 BMAP_NAVIGATION_CONTROL_SMALL: 仅包含平移和缩放按钮； /2 BMAP_NAVIGATION_CONTROL_PAN: 仅包含平移按钮； /3 BMAP_NAVIGATION_CONTROL_ZOOM: 仅包含缩放按钮; */
+    // map.setDefaultCursor("pointer");    //设置鼠标为手形
+
+    // 测距工具
+    var myDis = new BMapLib.DistanceTool(map);
+    // 设置图标
+    Init_icon();
+    Set_icon_b();
+    
+    // 数组&变量申明
+    // 显示无人机的位置
+    NNN_temp = 11;  // 无人机最大个数+1
+    drone_current_pos_mark = new Array();
+    drone_current_pos_mark_temp = new Array();
+    // 显示无人机 轨迹
+    drone_last_pos_num = new Array();
+    drone_last_track_polyline = new Array(); 
+    // 初始化
+    Init_Set_drone_GPS(116.323192, 39.965301);   // 初始无人机位置
+    Init_plane_track(); // 初始无人机轨迹
+    // alert(233);
+
+    // 显示航迹
+    // drone_last_track_polyline[i].setPath(drone_last_pos_num[i]);
+
+    /*
+    //---------------------------------------------------------------
+    // eg
+    sy = new BMap.Symbol(BMap_Symbol_SHAPE_BACKWARD_OPEN_ARROW, {
+        scale: 0.6,//图标缩放大小
+        strokeColor:'#fff',//设置矢量图标的线填充颜色
+        strokeWeight: '2',//设置线宽
+    });
+    icons_22 = new BMap.IconSequence(sy, '10', '30');
+    // 创建polyline对象
+    pois= new Array();
+    pois[3] = [];
+    // pois.push(new BMap.Point(116.442501,39.914603));
+    polyline = new Array();
+    
+    polyline[3] = new BMap.Polyline(pois[3], {
+       enableEditing: false,//是否启用线编辑，默认为false
+       enableClicking: false,//是否响应点击事件，默认为true
+       icons: [icons_22],
+       strokeWeight:'8',//折线的宽度，以像素为单位
+       strokeOpacity: 0.8,//折线的透明度，取值范围0 - 1
+       strokeColor:"#18a45b" //折线颜色
+    });
+    map.addOverlay(polyline[3]);          //增加折线
+
+    drone_last_pos_num[3] = [
+    new BMap.Point(116.322192,39.962301),
+    new BMap.Point(116.322192,39.967301),
+    new BMap.Point(116.327192,39.967301)
+    ];
+
+    drone_last_pos_num[4] = [
+    new BMap.Point(116.322692,39.962801),
+    new BMap.Point(116.322692,39.967801),
+    new BMap.Point(116.324192,39.962301)
+    ];
+
+    pois[3] = [
+    new BMap.Point(116.323192,39.962301),
+    new BMap.Point(116.323192,39.967301),
+    new BMap.Point(116.328192,39.967301)
+    ];
+
+    // polyline[3].setPath(pois[3]);
+
+    pois[3].push( new BMap.Point(116.323192,39.962301) );
+    // polyline[3].setPath(pois[3]);
+    //---------------------------------------------------------------
+    */
+    
+
+    // 数组
+    //var arrayObj = new Array(11);
+    //arrayObj[18] = [3, 4];
+    //alert(arrayObj[18]);
+    //alert(arrayObj);
+
+    //----------------------------------------------------------------
+    // 初始化 飞机轨迹 点 init
+    function Init_plane_track()
+    {   
+        for (var i=0; i<NNN_temp; i++)
+        {   
+            drone_last_pos_num[i] = [];
+            drone_last_track_polyline[i] = new BMap.Polyline(drone_last_pos_num[i], {
+                enableEditing: false,//是否启用线编辑，默认为false
+                enableClicking: false,//是否响应点击事件，默认为true
+                // icons: [icons_track],
+                strokeWeight:'8',//折线的宽度，以像素为单位
+                strokeOpacity: 0.8,//折线的透明度，取值范围0 - 1
+                strokeColor:"#18a45b" //折线颜色
+            });
+            map.addOverlay(drone_last_track_polyline[i]); // 增加折线
+        }
+    }
+    //----------------------------------------------------------------
+    // qt 直接访问此函数 
+    // 清除航迹_1 单架
+    function plane_track_clean(num)
+    {
+        var num_t = parseInt(num);
+        drone_last_pos_num[num_t] = [];
+        drone_last_track_polyline[num_t].setPath(drone_last_pos_num[num_t]);
+    }
+    // 清除航迹_2 全部
+    function plane_track_clean_all()
+    {
+        for (var i=0; i<NNN_temp; i++)
+        {
+            drone_last_pos_num[i] = [];
+            drone_last_track_polyline[i].setPath(drone_last_pos_num[i]);
+        }
+    }
+    //----------------------------------------------------------------
+    // 隐藏航迹_1 单架
+    function plane_track_hide(num)
+    {
+        var num_t = parseInt(num);
+        drone_last_track_polyline[num_t].hide();
+    }
+    // 隐藏航迹_2 全部
+    function plane_track_hide_all()
+    {
+        for (var i=0; i<NNN_temp; i++)
+        {
+            drone_last_track_polyline[i].hide();
+        }
+    }
+    //----------------------------------------------------------------
+    // 显示航迹_1 单架
+    function plane_track_show(num)
+    {
+        var num_t = parseInt(num);
+        drone_last_track_polyline[num_t].show();
+    }
+    // 隐藏航迹_2 全部
+    function plane_track_show_all()
+    {
+        for (var i=0; i<NNN_temp; i++)
+        {
+            drone_last_track_polyline[i].show();
+        }
+    }
+    //----------------------------------------------------------------
+    // 增加航迹点
+    function plane_track_add_point(xL,yL,num)
+    {   
+        var num_t = parseInt(num);
+        drone_last_pos_num[num_t].push( new BMap.Point(xL, yL) );
+        drone_last_track_polyline[num_t].setPath(drone_last_pos_num[num_t]);        
+    }
+
+    //----------------------------------------------------------------
+    // if ( map.getMapType().getName() == "地图")   获取地图当前图册类型 地图、混合、卫星
+    // qt 直接访问此函数 
+    // 设置地图 图标颜色     
+    function Set_icon_w()
+    {   
+        myIcon_home = myIcon_home_w;        // Home 点
+        myIcon_C16 = myIcon_C16_w;          // 航迹 圆点
+        myIcon_S16 = myIcon_S16_w;          // 航迹 星
+        myIcon_D16 = myIcon_D16_w;          // 飞机
+    }
+    function Set_icon_b()
+    {   
+        myIcon_home = myIcon_home_b;        // Home 点
+        myIcon_C16 = myIcon_C16_b;          // 航迹 圆点
+        myIcon_S16 = myIcon_S16_b;          // 航迹 星
+        myIcon_D16 = myIcon_D16_b;          // 飞机
+    } 
+    function Init_icon()
+    {   // 图标
+        // Home 点
+        // myIcon_home_w = new BMap.Icon("./html_img/home_w32.png", new BMap.Size(32, 64), {imageOffset : new BMap.Size(0, 8)} );
+        myIcon_home_w = new BMap.Icon("./html_img/home_w24.png", new BMap.Size(24, 24), {imageOffset : new BMap.Size(0, 0)} );
+        myIcon_home_b = new BMap.Icon("./html_img/home_b24.png", new BMap.Size(24, 24), {imageOffset : new BMap.Size(0, 0)} );
+        // 航迹 圆点
+        myIcon_C16_w = new BMap.Icon("./html_img/mCircle_w16.png", new BMap.Size(16,16), {imageOffset : new BMap.Size(0, 0)} ); 
+        myIcon_C16_b = new BMap.Icon("./html_img/mCircle_b16.png", new BMap.Size(16,16), {imageOffset : new BMap.Size(0, 0)} );
+        // 航迹 星
+        myIcon_S16_w = new BMap.Icon("./html_img/mStar_w16.png", new BMap.Size(16,16), {imageOffset : new BMap.Size(0, 0)} ); 
+        myIcon_S16_b = new BMap.Icon("./html_img/mStar_b16.png", new BMap.Size(16,16), {imageOffset : new BMap.Size(0, 0)} ); 
+        // 飞机
+        myIcon_D16_w = new BMap.Icon("./html_img/drone_w16.png", new BMap.Size(16,16), {imageOffset : new BMap.Size(0, 0)} ); 
+        myIcon_D16_b = new BMap.Icon("./html_img/drone_b16.png", new BMap.Size(16,16), {imageOffset : new BMap.Size(0, 0)} ); 
+        // 绘制路线 带箭头 ？ 有 bug
+        sy_track = new BMap.Symbol(BMap_Symbol_SHAPE_BACKWARD_OPEN_ARROW, {
+            scale: 0.6,         //图标缩放大小
+            strokeColor:'#fff', //设置矢量图标的线填充颜色
+            strokeWeight: '2',  //设置线宽
+        });
+        icons_track = new BMap.IconSequence(sy_track, '10', '30');
+    }
+    
+    // 初始无人机位置
+    function Init_Set_drone_GPS(xL,yL)
+    {   
+        marker1 = new BMap.Marker(new BMap.Point(xL, yL));
+        // alert(1);
+        for (i=0; i<NNN_temp; i++)
+        {
+            drone_current_pos_mark_temp.push( new BMap.Marker(new BMap.Point(xL, yL), {icon: myIcon_D16}) );
+            // alert(i);
+            drone_current_pos_mark.push(drone_current_pos_mark_temp[i]);
+            map.addOverlay(drone_current_pos_mark[i]);    // 将标注添加到地图
+            drone_current_pos_mark[i].hide();
+            drone_current_pos_mark[i].setLabel( new BMap.Label(i,{offset:new BMap.Size(15, 0)}) );
+        }                                                                                                                           
+    }
+    // 显示无人机位置
+    function Set_drone_GPS(xL,yL,num)
+    {   
+        var num_t = parseInt(num);
+        drone_current_pos_mark[num_t].setIcon(myIcon_D16);  
+        drone_current_pos_mark[num_t].setPosition( new BMap.Point(xL, yL) );
+        drone_current_pos_mark[num_t].show();        
+    }
+
+    //----------------------------------------------------------------
+    // qt 直接访问此函数
+    // 地图测距工具
+    function mydis_eventListen()
+    {   myDis.open(); }             //开启鼠标测距
+    function Set_myDis_open()
+    {   map.addEventListener("click", mydis_eventListen);}
+    function Set_myDis_close()
+    {   map.removeEventListener("click", mydis_eventListen);
+        myDis.close();  //关闭鼠标测距
+    }
+
+    //----------------------------------------------------------------
+    // qt 直接 访问此函数
+    // 视野回到 Home 中心点
+    function Set_centerLonLat(xL,yL)
+    {   map.centerAndZoom(new BMap.Point(xL, yL), map.getZoom() );  }
+
+    //----------------------------------------------------------------
+    // qt 直接 访问此函数
+    // 设置 Home 点　初始第一次
+    function Set_Home_GPS(xL,yL) 
+    {   
+        marker_Home = new BMap.Marker(new BMap.Point(xL, yL), {icon: myIcon_home});
+        map.addOverlay(marker_Home);    // 将标注添加到地图
+        marker1.hide();
+        marker_Home.setLabel( new BMap.Label("Home",{offset:new BMap.Size(-6,24)}) );
+    }
+    // 设置 Home 点　第二次及之后
+    function Set_Home_GPS_2(xL,yL) {   
+        marker_Home.setIcon(myIcon_home);  
+        marker_Home.setPosition( new BMap.Point(xL, yL) );
+        marker1.hide();
+    }
+
+    //----------------------------------------------------------------
+    // qt 直接 访问此函数
+    // 点击返回 GPS 坐标　初始第一次
+    function back_GPS2qt(e)
+    {   //alert("222_您点击了地图");
+        map.setDefaultCursor("pointer");    //设置鼠标为手形
+        new QWebChannel(qt.webChannelTransport, function (channel) {
+            var qtui = channel.objects.qtui;
+            qtui.recieveJsMessage_Point_GPS(e.point.lng.toFixed(6) + "," + e.point.lat.toFixed(6));
+        });
+        marker1.setPosition(new BMap.Point(e.point.lng, e.point.lat));      // 创建标注
+        map.addOverlay(marker1);                // 将标注添加到地图中
+        map.removeEventListener("click", back_GPS2qt);
+    }
+    function addMapEvent_GetCheckPointGPS() 
+    {   map.setDefaultCursor("crosshair");  //设置鼠标为 十字 
+        map.addEventListener("click", back_GPS2qt); 
+    }
+    // 点击返回 GPS 点　第二次及之后
+    function back_GPS2qt_2(e)
+    {   map.setDefaultCursor("pointer");    //设置鼠标为手形
+        new QWebChannel(qt.webChannelTransport, function (channel) {
+            var qtui = channel.objects.qtui;
+            qtui.recieveJsMessage_Point_GPS(e.point.lng.toFixed(6) + "," + e.point.lat.toFixed(6));
+        });
+        marker1.setPosition(new BMap.Point(e.point.lng, e.point.lat));
+        marker1.show();
+        map.removeEventListener("click", back_GPS2qt_2);
+    }
+    function addMapEvent_GetCheckPointGPS_2() 
+    {   marker1.hide();
+        map.setDefaultCursor("crosshair");  //设置鼠标为 十字 
+        map.addEventListener("click", back_GPS2qt_2);
+    }
+
+</script>
+
+<script type="text/javascript">
+    //---------------------------------------------------------
+    // 测试用 - 233
+    function check_test_1()
+    {   addMapEvent_GetCheckPointGPS();
+    } 
+    function check_test_2()
+    {   map.removeEventListener("click", back_GPS2qt);
+    } 
+
+    // 获取字符串文本
+	function getInfo()
+	{   var textString = "HTML js函数的返回值";
+
+        textString = map.getMapType().getName();
+        if ( map.getMapType().getName() == "地图")
+        textString = "YES";
+
+        return textString;
+	}
+</script>
+
+<script type="text/javascript"> // 添加绿色箭头线
+    var sy = new BMap.Symbol(BMap_Symbol_SHAPE_BACKWARD_OPEN_ARROW, {
+        scale: 0.6,//图标缩放大小
+        strokeColor:'#fff',//设置矢量图标的线填充颜色
+        strokeWeight: '2',//设置线宽
+    });
+    var icons_test = new BMap.IconSequence(sy, '10', '30');
+    // 创建polyline对象
+    var pois = [
+        new BMap.Point(116.350658,39.938285),
+        new BMap.Point(116.386446,39.939281),
+        new BMap.Point(116.389034,39.913828)
+    ];
+    pois.push(new BMap.Point(116.442501,39.914603));
+
+    var polyline =new BMap.Polyline(pois, {
+       enableEditing: false,//是否启用线编辑，默认为false
+       enableClicking: true,//是否响应点击事件，默认为true
+       icons: icons_test,
+       strokeWeight:'8',//折线的宽度，以像素为单位
+       strokeOpacity: 0.8,//折线的透明度，取值范围0 - 1
+       strokeColor:"#18a45b" //折线颜色
+    });
+    map.addOverlay(polyline);          //增加折线
+</script>
+
+<script type="text/javascript">
+	// 创建点
+    var polyline = new BMap.Polyline([
+        new BMap.Point(116.399, 39.910),
+        new BMap.Point(116.405, 39.920),
+        new BMap.Point(116.425, 39.900)
+    ], {
+        strokeColor: 'blue',
+        strokeWeight: 2,
+        strokeOpacity: 0.5
+    });
+    // 添加覆盖物
+    function addOverlay() {
+        map.addOverlay(polyline); // 增加折线
+    }
+    // 清除覆盖物
+    function removeOverlay() {
+        map.clearOverlays();
+    }
+</script>

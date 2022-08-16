@@ -9,3 +9,7 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 _deps
+.vscode
+offline_bmap/API.md
+offline_bmap/BMap_offline_backup地图中有按钮.html
+offline_bmap/Html_API.md

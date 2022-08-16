@@ -1,0 +1,3 @@
+<launch>
+  <node pkg="map_widget" type="map_widget" name="map_widget" required="true"/>
+</launch>
