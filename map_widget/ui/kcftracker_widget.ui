@@ -185,7 +185,7 @@
   <customwidget>
    <class>trackerQGraphicsView</class>
    <extends>QGraphicsView</extends>
-   <header location="global">../../src/map_widget/include/map_widget/trackerQGraphicsView.hpp</header>
+   <header location="global">../map_widget/include/map_widget/trackerQGraphicsView.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>
