@@ -25,6 +25,7 @@ rtsp_single_widget::rtsp_single_widget(int argc, char** argv, QWidget *parent) :
     urls_topic << "/usb_cam/image_rect_color";
     urls_topic << "/usb_cam/image_raw";
     urls_topic << "/camera/color/image_raw";
+    urls_topic << "/csi_cam_0/image_raw";
     ui->comboBox_topic->addItems(urls_topic);
     ui->comboBox_topic->setCurrentIndex(0);
 

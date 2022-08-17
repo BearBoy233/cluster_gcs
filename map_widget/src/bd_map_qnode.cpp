@@ -25,7 +25,7 @@ bool bd_map_QNode::init() {
 	ros::start(); // explicitly needed since our nodehandle is going out of scope.
 	ros::NodeHandle n;
 
-  n.param<std::string>("rospackage_path", rospackage_path, "~/zy_new_mavros/cq_gcs/src/cluster_gcs");
+  // n.param<std::string>("rospackage_path", rospackage_path, "~/zy_new_mavros/cq_gcs/src/cluster_gcs");
   n.param<double>("map_init_lon", map_init_lon, 116);
   n.param<double>("map_init_lat", map_init_lat, 39);
 

@@ -2,7 +2,6 @@
 <launch>
 
 	<!-- MAP 模块 --> 
-    	<arg name="rospackage_path" default="$(find map_widget)" />
 	<arg name="map_init_lon" default="116.323192" />
 	<arg name="map_init_lat" default="39.965301" />
 
@@ -17,7 +16,6 @@
                 [ /camera/color/image_raw] 	/csi_cam_0
         -->
 
-	<param name="rospackage_path" value="$(arg rospackage_path)" type="string" />
         <param name="map_init_lon" value="$(arg map_init_lon)" type="double" />
         <param name="map_init_lat" value="$(arg map_init_lat)" type="double" />
         

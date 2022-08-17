@@ -31,18 +31,20 @@ bd_map_widget::bd_map_widget(int argc, char** argv, QWidget *parent)
   }
 
   // loadHtml();
-  // 获取程序所在路径，切换到同目录下的 地图html
-  // 导入的是 ..cq_gcs/devel.. 的名称
-  // QString htmlPath = QCoreApplication::applicationDirPath();
   // // 显示APP 路径 /home/zy/zy_new_mavros/cq_gcs/devel/lib/map_widget;
   // // ui->label->setText(qApp->applicationDirPath());
-  // QString temp_path_y = "cq_gcs";
-  // int temp_path_1 = htmlPath.indexOf(temp_path_y);
-  // temp_path_y = "file://" + htmlPath.left(temp_path_1) + "cq_gcs/src/cluster_gcs/offline_bmap/BMap_offline.html";
+  // 获取程序所在路径，切换到同目录下的 地图html
+  // 导入的是 ..cq_gcs/devel.. 的名称
+  QString htmlPath = QCoreApplication::applicationDirPath();
+  QString temp_path_y = "devel";
+  int temp_path_1 = htmlPath.indexOf(temp_path_y);
+  temp_path_y = "file://" + htmlPath.left(temp_path_1) + "src/cluster_gcs/offline_bmap/BMap_offline.html";
 
   // 通过ROS导入
-  QString temp_path_y;
-  temp_path_y = "file://" + QString::fromStdString(bd_map_qnode.rospackage_path) + "/../offline_bmap/BMap_offline.html";
+  // QString temp_path_y;
+  // QString htmlPath = QString::fromStdString(bd_map_qnode.rospackage_path);
+  // htmlPath.remove(0,1);
+  // temp_path_y = "file:///home" + QString::fromStdString(bd_map_qnode.rospackage_path) + "/offline_bmap/BMap_offline.html";
   qDebug() << "Map_html path = " << temp_path_y;
 
   m_pWebView->load(QUrl(temp_path_y));
