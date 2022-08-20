@@ -66,7 +66,7 @@ void console_widget::init_comboBox_select()
   temp_items2 << "TAKING_OFF";
   temp_items2 << "LANDING";
   temp_items2 << "POS_EXECUTION";
-  temp_items2 << "FORMATION_FLY";
+  // temp_items2 << "Vel_EXECUTION";
   ui->comboBox_statemachine_nodestate->clear();
   ui->comboBox_statemachine_nodestate->addItems(temp_items2); // 转为rosmsg需要手动 + 1
   ui->comboBox_statemachine_nodestate->setCurrentIndex(0);

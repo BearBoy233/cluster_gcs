@@ -58,7 +58,7 @@ private:
     TAKING_OFF,               // 当前 loc 点起飞
     LANDING,                  // 当前 loc 点降落
     POS_EXECUTION,            // 位置控制
-    FORMATION_FLY,            // 编队飞行
+    Vel_EXECUTION,            // 速度控制
     WAITING_FOR_HOME_POSE,    // 此和下面的状态 无法通过地面站切换到
     TAKEOFF_FAIL,
     LANDED,
