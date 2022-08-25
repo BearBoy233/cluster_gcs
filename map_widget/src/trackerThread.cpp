@@ -40,6 +40,8 @@ void tracker_thread::trackerResult_cb(const mavcomm_msgs::kcf_target_pos& msg)
   {
     trackResult.state = msg.state;
   }
+  // gcs 只用到了 state
+  // TODO: loc_enu rviz 中轨迹显示
 }
 
 bool tracker_thread::init(std::uint8_t uavID)
@@ -68,7 +70,7 @@ bool tracker_thread::init(std::uint8_t uavID)
 
   // 订阅 图像信息
   if (uav1_gcs2 == 1)
-  {
+  { // 用于本地 kcf 框选测试
     // 测试 飞机端
     receiveImage_sub = it.subscribe(uav_video_topic , 5, &tracker_thread::receiveImage_cb, this, image_transport::TransportHints("compressed"));
     // 发布 候选框
@@ -80,8 +82,15 @@ bool tracker_thread::init(std::uint8_t uavID)
   {
     // 发布 候选框
     trackRoi_pub= nh.advertise<mavcomm_msgs::kcf_set_target>("/mavcomm/send/kcf_set_target", 10);
+    // TODO 如何告知另一架无人机
+    // 设想 在 mission 中控制
+
     // 订阅 追踪结果
     trackerResult_sub = nh.subscribe("/mavcomm/receive/kcf_target_pos", 1, &tracker_thread::trackerResult_cb, this);
+    // TODO
+    // 当前仅完成本机追踪
+    // 如果为告知另一架无人机 如何修改呈现
+    // 设想 在 mission 中控制
 
     // 地面端
     // QString String_rtsp_id;

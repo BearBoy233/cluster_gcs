@@ -120,6 +120,7 @@ void kcfTracker_widget::deal_receiveImageSignal()
   showImage_mutex_.unlock();
 
   // TODO 飞机ID 和 追踪目标ID 判断
+  // TODO 提示中 增加无人机 ID
   if (trackerThread.is_tracking )//&& trackerThread.trackResult.sysid == trackerThread.uavid )
   {
     if(trackerThread.trackResult.state == 0)//追踪失败
@@ -159,6 +160,12 @@ void kcfTracker_widget::deal_receiveImageSignal()
       ui->trackState_label->setStyleSheet("background: rgb(0, 0, 255)");
       ui->label_track_state->setText( QString("已发送框选，等待无人机响应") );
       // 已发送框选，等待无人机响应
+    }
+    if(trackerThread.trackResult.state == 5)
+    {
+      ui->trackState_label->setStyleSheet("background: rgb(255, 0, 255)");
+      ui->label_track_state->setText( QString("Track节点，无人机无图像！") );
+      // Track节点，无人机无图像
     }
   }
   else
