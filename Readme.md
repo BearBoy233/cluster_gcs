@@ -14,6 +14,10 @@ roslaunch map_widget gcs_map.launch
 Qt Creator 4.9.2
 Based on Qt 5.12.4(QGC 7.4.0)
 
+opencv 3 (理论上4也行)
+
+
+
 --- ---
 ### 程序包说明
 

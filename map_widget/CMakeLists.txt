@@ -28,7 +28,7 @@ set(QT_LIBRARIES Qt5::Core Qt5::Gui Qt5::Widgets Qt5::OpenGL Qt5::Qml Qt5::Quick
    )
 find_package(Qt5 REQUIRED ${QT})
 
-find_package(OpenCV 3 REQUIRED)
+find_package(OpenCV REQUIRED) # 3 /4 
 find_package(catkin REQUIRED COMPONENTS
     roscpp
     message_generation

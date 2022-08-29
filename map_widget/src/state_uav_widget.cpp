@@ -19,9 +19,9 @@ state_uav_widget::state_uav_widget(int argc, char** argv, QWidget *parent)
 
   // 获取程序所在路径，切换到同目录下的
   htmlPath = QCoreApplication::applicationDirPath();
-  temp_path_head = "cq_gcs";
+  temp_path_head = "devel";
   int temp_path_1 = htmlPath.indexOf(temp_path_head);
-  temp_path_head = htmlPath.left(temp_path_1) + "cq_gcs/src/map_widget/resources/images/";
+  temp_path_head = htmlPath.left(temp_path_1) + "src/cluster_gcs/map_widget/resources/images/";
 
   //--------------------------------------------------------------------------
   initConncetion();   //初始化槽函数
