@@ -51,7 +51,7 @@ private:
   bool flag_drone_no = true;
 
   // 无人机状态 changestate /uav_ctrl.cpp#enum FlightState
-  // 需要同步修改 px4_ctrl.cpp & console_widget.hpp/cpp & state_single_widget.hpp
+  // 需要同步修改 px4_offb.cpp & console_widget.hpp/cpp & state_single_widget.hpp
   enum FlightState {
     UNINIT,                   // 未知状态
     IDLE,                     // 什么都不干 地面待机状态
