@@ -48,19 +48,6 @@ include_directories(
 	# ${CMAKE_CURRENT_BINARY_DIR}/..
 )
 
-add_message_files(
-  FILES
-  # M_KCF_Select.msg
-)
-generate_messages(
-  DEPENDENCIES
-  std_msgs
-)
-
-# add_message_files(
-#  FILES
-#)
-
 #generate_messages(
 #  DEPENDENCIES
   #geometry_msgs nav_msgs std_msgs sensor_msgs

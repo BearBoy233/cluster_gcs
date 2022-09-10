@@ -47,3 +47,10 @@ win_offline_tiles	WIN下，下载百度地图离线瓦片地图
 4. 随后可使用 Qt 设计 Ui界面、编译和运行.
 
 5. 之后使用, 用Qt打开 `your_workspace_name.workspace` 文件。
+
+
+## 依赖
+
+sudo apt install qtpositioning5-dev libqt5sensors5-dev qtmultimedia5-dev
+
+sudo apt install qtwebengine5-dev libqt5webview5-dev
