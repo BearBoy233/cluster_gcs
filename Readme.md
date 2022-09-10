@@ -27,6 +27,8 @@ offline_bmap		Html 离线版 百度地图页面
 
 offline_tiles		存放 离线的地图瓦片包
 
+[奶牛快传-bit-202209](https://cowtransfer.com/s/a9aef19af4904c)  *cowtransfer.com 传输口令 u68gzm*
+
 win_offline_tiles	WIN下，下载百度地图离线瓦片地图
 
 --- ---
